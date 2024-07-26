@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/">
+        <file>src/view/main.qml</file>
+        <file>src/view/SensorView.qml</file>
+        <file>src/view/HomeView.qml</file>
+        <file>src/view/ConfigurationView.qml</file>
+        <file>src/view/components/VolumeControl.qml</file>
+        <file>src/view/components/WaveformDisplay.qml</file>
+        <file>src/view/components/SensitivityControl.qml</file>
+        <file>src/view/components/SampleSelector.qml</file>
+    </qresource>
+</RCC>
