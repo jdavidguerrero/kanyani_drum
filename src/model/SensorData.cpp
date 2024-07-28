@@ -1,14 +1,15 @@
 #include "SensorData.h"
 
-SensorData::SensorData()
+SensorData::SensorData(QObject *parent)
+    : QObject(parent)
 {
-    // Inicialización de tus datos, si es necesario
+    // Aquí puedes inicializar cualquier otra cosa que necesites
 }
 
 int SensorData::readSensor(int sensorIndex)
 {
-    // Aquí deberías implementar la lógica para leer el sensor correspondiente
-    // Por ejemplo, si estás utilizando ADS1115, deberías llamar a la función adecuada para leer el valor del sensor
-    // Supongamos que tienes una instancia de ADS1115 llamada `m_ads1115`
-    return m_ads1115.readADC_SingleEnded(sensorIndex);
+    int device = sensorIndex / 4; // Asumiendo que tienes 2 dispositivos y 4 canales por dispositivo
+    int channel = sensorIndex % 4;
+    int16_t value = m_adsController.readADC_SingleEnded(device, channel);
+    return value;
 }

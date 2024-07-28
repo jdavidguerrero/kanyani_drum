@@ -15,13 +15,13 @@ SOURCES += \
     src/main.cpp \
     src/controller/SensorController.cpp \
     src/utils/ads1115/ads1115.cpp \
-    src/model/SensorData.cpp
+    src/model/SensorData.cpp \
     src/audio/AudioModule.cpp
 
 HEADERS += \
     src/controller/SensorController.h \
     src/utils/ads1115/ads1115.h \
-    src/model/SensorData.h
+    src/model/SensorData.h \
     src/audio/AudioModule.h
 
 # Configuración de los recursos

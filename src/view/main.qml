@@ -5,30 +5,61 @@ import SensorController 1.0
 
 ApplicationWindow {
     visible: true
-    width: 640
+    width: 800
     height: 480
     title: qsTr("Sensor App")
 
-    SensorController {
-        id: sensorController
+    StackView {
+        id: stackView
+        anchors.fill: parent
+        initialItem: homeViewComponent
     }
 
-    StackLayout {
-        id: stackLayout
-        anchors.fill: parent
-
+    Component {
+        id: homeViewComponent
         HomeView {
-            id: homeView
+            sensorValues: sensorController.sensorValues
+        }
+    }
+
+    Component {
+        id: configurationViewComponent
+        ConfigurationView {
+            thresholds: sensorController.thresholds
+            samples: sensorController.samples
+        }
+    }
+
+    Row {
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        Button {
+            text: "Home"
+            onClicked: stackView.pop()
         }
 
-        ConfigurationView {
-            id: configurationView
-            thresholds: sensorController.thresholds
-            onThresholdsChanged: sensorController.setThresholds(thresholds)
+        Button {
+            text: "Configuration"
+            onClicked: stackView.push(configurationViewComponent)
         }
     }
 
     Component.onCompleted: {
         sensorController.startReading()
+    }
+
+    Connections {
+        target: sensorController
+        onThresholdsChanged: {
+            if (stackView.currentItem === configurationViewComponent) {
+                configurationViewComponent.forceLayout() // Refresh view if necessary
+            }
+        }
+        onSamplesChanged: {
+            if (stackView.currentItem === configurationViewComponent) {
+                configurationViewComponent.forceLayout() // Refresh view if necessary
+            }
+        }
     }
 }

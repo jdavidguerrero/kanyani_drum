@@ -326,8 +326,8 @@ ADS1115_0::ADS1115_0()
 {
     m_i2c_handle = 0;
     m_bitShift = 0;
-    m_gain = GAIN_ONE;
-    m_dataRate = RATE_ADS1115_128SPS;
+    m_gain = GAIN_FOUR;
+    m_dataRate = RATE_ADS1115_475SPS;
 
     begin(ADS1115_ADDRESS_0);
 }
@@ -337,8 +337,8 @@ ADS1115_1::ADS1115_1()
 {
     m_i2c_handle = 0;
     m_bitShift = 0;
-    m_gain = GAIN_ONE;
-    m_dataRate = RATE_ADS1115_128SPS;
+    m_gain = GAIN_FOUR;
+    m_dataRate = RATE_ADS1115_475SPS;
 
     begin(ADS1115_ADDRESS_1);
 }

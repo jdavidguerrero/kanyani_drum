@@ -1,10 +1,17 @@
 #ifndef AUDIOMODULE_H
 #define AUDIOMODULE_H
 
-#include "RtAudio.h"
 #include <chrono>
 #include <vector>
 #include <string>
+
+#ifdef OUTPUT
+#undef OUTPUT
+#endif
+#ifdef INPUT
+#undef INPUT
+#endif
+#include "RtAudio.h"
 
 class AudioSample
 {
@@ -25,6 +32,7 @@ public:
     AudioModule();
     ~AudioModule();
     size_t activeChannel = -1;
+    std::string getSampleForChannel(size_t channel) const;
     void loadSampleForChannel(const std::string &filename, size_t channel);
     void playSample(size_t channel);
     void setVolumeChannel(size_t channel, int volumeLevel);

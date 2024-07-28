@@ -1,53 +1,62 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Dialogs 1.2
 
 Item {
-    property var sensorController
+    id: configurationView
+    property var thresholds: []
+    property var samples: []
+
+    width: parent.width
+    height: parent.height
 
     ColumnLayout {
-        anchors.fill: parent
-        spacing: 10
-
-        Text {
-            text: "Configuration"
-            font.bold: true
-            font.pixelSize: 20
-        }
+        anchors.centerIn: parent
 
         Repeater {
-            model: sensorController.thresholds.length
-
-            RowLayout {
-                spacing: 10
-
-                Text {
-                    text: "Sensor " + index + " Threshold:"
-                    font.pixelSize: 16
-                }
-
-                Slider {
-                    from: 0
-                    to: 1023
-                    value: sensorController.thresholds[index]
-                    onValueChanged: {
-                        var thresholds = sensorController.thresholds
-                        thresholds[index] = value
-                        sensorController.thresholds = thresholds
+            model: thresholds.length
+            delegate: ColumnLayout {
+                RowLayout {
+                    Label {
+                        text: "Sensor " + (index + 1) + ":"
+                    }
+                    Slider {
+                        from: 0
+                        to: 15000
+                        value: thresholds[index]
+                        onValueChanged: {
+                            thresholds[index] = value;
+                            sensorController.setThresholds(thresholds);
+                        }
+                    }
+                        Label {
+                        text: thresholds[index].toFixed(0)
+                        width: 40
+                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
 
-                Text {
-                    text: sensorController.thresholds[index]
-                    font.pixelSize: 16
+                RowLayout {
+                    Label {
+                        text: "Sample for Sensor " + (index + 1) + ":"
+                    }
+                    Button {
+                        text: samples[index]
+                        onClicked: fileDialog.open()
+                    }
+                    FileDialog {
+                        id: fileDialog
+                        title: "Select Sample"
+                        nameFilters: ["Audio files (*.wav *.mp3)"]
+                        onAccepted: {
+                            var fullPath = fileDialog.fileUrl.toString().substring("file://".length);
+                            console.log("Selected file: " + fullPath);
+                            sensorController.setSampleForChannel(fullPath, index)
+                        }
+                        
+                    }
                 }
-            }
-        }
-
-        Button {
-            text: "Back to Home"
-            onClicked: {
-                stackView.pop()
             }
         }
     }

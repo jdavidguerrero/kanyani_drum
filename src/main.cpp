@@ -13,6 +13,8 @@ int main(int argc, char *argv[])
     SensorData sensorData;
     SensorController sensorController(&sensorData);
 
+    qmlRegisterSingletonInstance("SensorController", 1, 0, "SensorController", &sensorController);
+
     engine.rootContext()->setContextProperty("sensorController", &sensorController);
 
     const QUrl url(QStringLiteral("qrc:/src/view/main.qml"));

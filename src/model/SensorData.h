@@ -1,17 +1,20 @@
 #ifndef SENSORDATA_H
 #define SENSORDATA_H
 
-#include <vector>
-#include "utils/ads1115/Ads1115.h" // Asegúrate de incluir el archivo adecuado para ADS1115
+#include <QObject>
+#include "utils/ads1115/Ads1115.h"
 
-class SensorData
+class SensorData : public QObject
 {
+    Q_OBJECT
+
 public:
-    SensorData();
-    int readSensor(int sensorIndex); // Función para leer el valor del sensor
+    explicit SensorData(QObject *parent = nullptr);
+    int readSensor(int sensorIndex);
+    int getSensorCount() const { return 8; }
+
 private:
-    ADS1115 m_ads1115; // Instancia de la clase ADS1115
-    // Aquí podrías tener otros datos y funciones privadas
+    ControllerADS1115 m_adsController; // Instancia de la clase ControllerADS1115
 };
 
 #endif // SENSORDATA_H

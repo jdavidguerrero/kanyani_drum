@@ -3,40 +3,29 @@ import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
 
 Item {
-    property var sensorController
+    id: homeView
+    property var sensorValues: []
+
+    width: parent.width
+    height: parent.height
 
     ColumnLayout {
-        anchors.fill: parent
-        spacing: 10
+        anchors.centerIn: parent
 
         Text {
-            text: "Sensor Values"
-            font.bold: true
-            font.pixelSize: 20
+            text: "Home View"
+            font.pixelSize: 24
         }
 
         Repeater {
-            model: sensorController.sensorValues.length
-
-            RowLayout {
-                spacing: 10
-
-                Text {
-                    text: "Sensor " + index + ":"
-                    font.pixelSize: 16
+            model: sensorValues.length
+            delegate: RowLayout {
+                Label {
+                    text: "Sensor " + (index + 1) + ":"
                 }
-
                 Text {
-                    text: sensorController.sensorValues[index]
-                    font.pixelSize: 16
+                    text: sensorValues[index]
                 }
-            }
-        }
-
-        Button {
-            text: "Configuration"
-            onClicked: {
-                stackView.push("qrc:/src/view/ConfigurationView.qml")
             }
         }
     }

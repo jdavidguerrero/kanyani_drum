@@ -1,4 +1,4 @@
-#include "audio/AudioModule.h"
+#include "AudioModule.h"
 #include <sndfile.h>
 #include <iostream>
 #include <cstring>
@@ -30,6 +30,7 @@ void AudioSample::loadFromFile(const std::string &filename)
     if (!file)
     {
         std::cerr << "Can't open file: " << filename << std::endl;
+        std::cerr << "Error: " << sf_strerror(file) << std::endl;
         return;
     }
 
@@ -129,8 +130,10 @@ void AudioModule::playSample(size_t channel)
     }
 }
 
-std::string AudioModule::getSampleForChannel(size_t channel) const {
-    if (channel < samples.size()) {
+std::string AudioModule::getSampleForChannel(size_t channel) const
+{
+    if (channel < samples.size())
+    {
         return samples[channel].filename;
     }
     return "";
