@@ -5,6 +5,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <algorithm>
 
 AudioModule::AudioModule()
 {
@@ -114,8 +115,11 @@ void AudioModule::playSample(size_t channel)
 {
     if (channel < samples.size())
     {
-        samples[channel].reset(); // Restablecer el contador de frames
-        activeChannel = channel;
+        samples[channel].reset();
+        if (std::find(activeChannels.begin(), activeChannels.end(), channel) == activeChannels.end())
+        {
+            activeChannels.push_back(channel);
+        }
         if (!dac.isStreamRunning())
         {
             try
@@ -129,7 +133,6 @@ void AudioModule::playSample(size_t channel)
         }
     }
 }
-
 std::string AudioModule::getSampleForChannel(size_t channel) const
 {
     if (channel < samples.size())
@@ -145,33 +148,35 @@ int AudioModule::audioCallback(void *outputBuffer, void *inputBuffer, unsigned i
     AudioModule *audioModule = static_cast<AudioModule *>(userData);
     float *out = static_cast<float *>(outputBuffer);
 
-    if (!audioModule || audioModule->activeChannel >= audioModule->samples.size())
-    {
-        std::fill_n(out, nBufferFrames * 2, 0); // Llenar de ceros si no hay datos válidos
-        return 0;
-    }
-    AudioSample &sample = audioModule->samples[audioModule->activeChannel];
-    if (sample.frameCounter >= sample.data.size())
-    {
-        std::fill_n(out, nBufferFrames * 2, 0);
-        return 0;
-    }
+    std::fill_n(out, nBufferFrames * 2, 0);
 
-    float volume = sample.volume;
-
-    for (unsigned int i = 0; i < nBufferFrames; ++i)
+    for (size_t channel : audioModule->activeChannels)
     {
-        if (sample.frameCounter < sample.data.size())
+        if (channel >= audioModule->samples.size())
+            continue;
+
+        AudioSample &sample = audioModule->samples[channel];
+        if (sample.frameCounter >= sample.data.size())
+            continue;
+
+        float volume = sample.volume;
+
+        for (unsigned int i = 0; i < nBufferFrames; ++i)
         {
-            *out++ = sample.data[sample.frameCounter++] * volume;                                                                  // Left Channel
-            *out++ = sample.data[sample.frameCounter < sample.data.size() ? sample.frameCounter++ : sample.frameCounter] * volume; // Right Channel
-        }
-        else
-        {
-            *out++ = 0; // Relleno si se alcanza el final del vector
-            *out++ = 0;
+            if (sample.frameCounter < sample.data.size())
+            {
+                out[i * 2] += sample.data[sample.frameCounter++] * volume;                                                                      // Left Channel
+                out[i * 2 + 1] += sample.data[sample.frameCounter < sample.data.size() ? sample.frameCounter++ : sample.frameCounter] * volume; // Right Channel
+            }
         }
     }
+
+    audioModule->activeChannels.erase(std::remove_if(audioModule->activeChannels.begin(), audioModule->activeChannels.end(),
+                                                     [audioModule](size_t channel)
+                                                     {
+                                                         return audioModule->samples[channel].frameCounter >= audioModule->samples[channel].data.size();
+                                                     }),
+                                      audioModule->activeChannels.end());
 
     return 0;
 }

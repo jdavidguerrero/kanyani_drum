@@ -31,7 +31,7 @@ class AudioModule
 public:
     AudioModule();
     ~AudioModule();
-    size_t activeChannel = -1;
+    std::vector<size_t> activeChannels;
     std::string getSampleForChannel(size_t channel) const;
     void loadSampleForChannel(const std::string &filename, size_t channel);
     void playSample(size_t channel);

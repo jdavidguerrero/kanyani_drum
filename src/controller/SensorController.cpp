@@ -217,30 +217,54 @@ void SensorController::loadSettings()
 {
     QSettings settings("GPROG", "Kanyani");
 
-    settings.beginGroup("SensorSettings");
-    for (int i = 0; i < NUM_SENSORS; ++i)
+    // Convertir QVariantList a QVector<int>
+    QList<QVariant> thresholdList = settings.value("thresholds").toList();
+    if (thresholdList.size() == NUM_SENSORS)
     {
-        m_thresholds[i] = settings.value(QString("threshold_%1").arg(i), 1000).toInt();
-        m_samples[i] = settings.value(QString("sample_%1").arg(i), "").toString();
-        if (!m_samples[i].isEmpty())
+        for (int i = 0; i < NUM_SENSORS; ++i)
         {
-            audioModule.loadSampleForChannel(m_samples[i].toStdString(), i);
+            m_thresholds[i] = thresholdList[i].toInt();
         }
     }
-    settings.endGroup();
+    else
+    {
+        m_thresholds.fill(1000, NUM_SENSORS);
+    }
+
+    // Convertir QStringList a QVector<QString>
+    QStringList sampleList = settings.value("samples").toStringList();
+    if (sampleList.size() == NUM_SENSORS)
+    {
+        for (int i = 0; i < NUM_SENSORS; ++i)
+        {
+            m_samples[i] = sampleList[i];
+        }
+    }
+    else
+    {
+        m_samples.fill("", NUM_SENSORS);
+    }
 }
 
 void SensorController::saveSettings() const
 {
     QSettings settings("GPROG", "Kanyani");
 
-    settings.beginGroup("SensorSettings");
-    for (int i = 0; i < NUM_SENSORS; ++i)
+    // Convertir QVector<int> a QList<QVariant>
+    QList<QVariant> thresholdList;
+    for (int threshold : m_thresholds)
     {
-        settings.setValue(QString("threshold_%1").arg(i), m_thresholds[i]);
-        settings.setValue(QString("sample_%1").arg(i), m_samples[i]);
+        thresholdList.append(threshold);
     }
-    settings.endGroup();
+    settings.setValue("thresholds", thresholdList);
+
+    // Convertir QVector<QString> a QStringList
+    QStringList sampleList;
+    for (const auto &sample : m_samples)
+    {
+        sampleList.append(sample);
+    }
+    settings.setValue("samples", sampleList);
 }
 
 void SensorController::setThresholds(const QVector<int> &thresholds)
